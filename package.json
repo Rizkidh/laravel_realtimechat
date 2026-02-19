@@ -1,0 +1,5 @@
+{
+    "name": "todolist-app",
+    "description": "Todo List App with Clean Architecture - Pure Blade Template",
+    "private": true
+}
