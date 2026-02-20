@@ -1,0 +1,14 @@
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/.git
+/.idea
+/.vscode
+/tests
+/phpunit.xml
+/package-lock.json
+/composer.lock
+/.env

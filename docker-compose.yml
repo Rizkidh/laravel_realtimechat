@@ -1,0 +1,99 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: todolist-app
+    container_name: todolist-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - todolist-network
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      REVERB_HOST: reverb
+    depends_on:
+      - db
+
+  web:
+    image: nginx:alpine
+    container_name: todolist-web
+    restart: unless-stopped
+    ports:
+      - "8051:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - todolist-network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: todolist-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - todolist-network
+    ports:
+      - "3307:3306"
+
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: todolist-app
+    container_name: todolist-reverb
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    command: php artisan reverb:start --host=0.0.0.0
+    ports:
+      - "${REVERB_PORT:-8080}:${REVERB_PORT:-8080}"
+    networks:
+      - todolist-network
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      REVERB_HOST: reverb
+    depends_on:
+      - app
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: todolist-app
+    container_name: todolist-worker
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    command: php artisan queue:work
+    networks:
+      - todolist-network
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      REVERB_HOST: reverb
+    depends_on:
+      - app
+      - db
+
+networks:
+  todolist-network:
+    driver: bridge
+
+volumes:
+  dbdata:
