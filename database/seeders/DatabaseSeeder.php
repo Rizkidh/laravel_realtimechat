@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         // Call all seeders
         $this->call([
+            UserSeeder::class,
             TodoSeeder::class,
         ]);
     }
