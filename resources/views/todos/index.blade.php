@@ -187,54 +187,8 @@
 </div>
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const selectAll = document.getElementById('select-all');
-        const checkboxes = document.querySelectorAll('.todo-checkbox');
-        const btnBatchDelete = document.getElementById('btn-batch-delete');
-        const selectedCount = document.getElementById('selected-count');
-
-        function updateBatchButton() {
-            const checked = document.querySelectorAll('.todo-checkbox:checked').length;
-            if (btnBatchDelete) {
-                btnBatchDelete.classList.toggle('hidden', checked === 0);
-                selectedCount.textContent = checked;
-            }
-        }
-
-        if (selectAll) {
-            selectAll.addEventListener('change', function () {
-                checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                updateBatchButton();
-            });
-        }
-
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', function () {
-                if (selectAll) {
-                    selectAll.checked = document.querySelectorAll('.todo-checkbox:checked').length === checkboxes.length;
-                }
-                updateBatchButton();
-            });
-        });
-    });
-
-    function confirmBatchDelete() {
-        const count = document.querySelectorAll('.todo-checkbox:checked').length;
-        if (count === 0) {
-            alert('Pilih minimal satu tugas untuk dihapus.');
-            return false;
-        }
-        return confirm('Yakin hapus ' + count + ' tugas yang dipilih?');
-    }
-
-    function deleteSingle(id) {
-        if (confirm('Yakin hapus tugas ini?')) {
-            const form = document.getElementById('single-delete-form');
-            form.action = '/todos/' + id;
-            form.submit();
-        }
-    }
-</script>
+<script src="{{ asset('storage/script/todos/service.js') }}"></script>
+<script src="{{ asset('storage/script/todos/controller.js') }}"></script>
 @endpush
 @endsection
+

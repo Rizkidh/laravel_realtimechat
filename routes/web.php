@@ -44,3 +44,6 @@ Route::middleware('auth')->group(function () {
         ->name('ai.ask')
         ->middleware('throttle:10,1'); // 10 requests per minute
 });
+Route::fallback( function (){
+    return "Halaman Yang kamu cari tidak ada";
+});

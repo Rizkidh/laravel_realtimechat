@@ -210,93 +210,12 @@
             forceTLS: {{ env("REVERB_SCHEME", "http") === "https" ? 'true' : 'false' }},
             enabledTransports: ['ws', 'wss'],
         });
-
-        // ── Navbar: Profile Dropdown ──
-        (function() {
-            const btn = document.getElementById('profileBtn');
-            const menu = document.getElementById('profileMenu');
-            const arrow = document.getElementById('profileArrow');
-            if (!btn || !menu) return;
-
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                menu.classList.toggle('hidden');
-                arrow.classList.toggle('rotate-180');
-            });
-
-            document.addEventListener('click', function() {
-                menu.classList.add('hidden');
-                arrow.classList.remove('rotate-180');
-            });
-        })();
-
-        // ── Navbar: Mobile Menu Toggle ──
-        (function() {
-            const btn = document.getElementById('mobileMenuBtn');
-            const menu = document.getElementById('mobileMenu');
-            const openIcon = document.getElementById('menuOpenIcon');
-            const closeIcon = document.getElementById('menuCloseIcon');
-            if (!btn || !menu) return;
-
-            btn.addEventListener('click', function() {
-                menu.classList.toggle('hidden');
-                openIcon.classList.toggle('hidden');
-                closeIcon.classList.toggle('hidden');
-            });
-        })();
-
-        // ── Navbar: Unread Badge ──
-        (function() {
-            function updateBadge(count) {
-                const badges = [document.getElementById('navUnreadBadge'), document.getElementById('mobileUnreadBadge')];
-                badges.forEach(function(badge) {
-                    if (!badge) return;
-                    if (count > 0) {
-                        badge.textContent = count > 99 ? '99+' : count;
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
-                });
-            }
-
-            // Fetch unread count
-            function fetchUnread() {
-                fetch('/chat/contacts', {
-                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var total = 0;
-                    if (data.contacts) {
-                        data.contacts.forEach(function(c) { total += c.unread_count || 0; });
-                    }
-                    updateBadge(total);
-                })
-                .catch(function() {});
-            }
-
-            fetchUnread();
-            // Listen for new messages on auth user's channel
-            var userId = document.querySelector('meta[name="auth-user-id"]');
-            if (userId && window.Echo) {
-                window.Echo.private('chat.' + userId.content)
-                    .listen('.message.sent', function() {
-                        fetchUnread();
-                    });
-            }
-
-            window.updateNavUnread = fetchUnread;
-        })();
-
-        // ── Online/Offline on page visibility ──
-        (function() {
-            var csrf = document.querySelector('meta[name="csrf-token"]').content;
-            window.addEventListener('beforeunload', function() {
-                navigator.sendBeacon('/chat/offline', new URLSearchParams({ _token: csrf }));
-            });
-        })();
     </script>
+
+    {{-- ═══════════════ ANGULAR-STYLE JS MODULES ═══════════════ --}}
+    <script src="{{ asset('storage/script/global/api-service.js') }}"></script>
+    <script src="{{ asset('storage/script/components/auto-resize.js') }}"></script>
+    <script src="{{ asset('storage/script/global/app.js') }}"></script>
 
     @stack('scripts')
 </body>
